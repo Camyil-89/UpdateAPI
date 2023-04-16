@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace UpdaterAPI.GitHub
 {
-	internal class InfoDowload
+	public class InfoDowload
 	{
+		public long SpeedDowload { get; set; }
+		public long TotalDowload { get; set; }
+		public long SizeFile { get; set; }
+		public string Path { get; set; }
+		public string Name { get; set; }
 	}
 }

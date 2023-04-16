@@ -16,18 +16,47 @@ namespace UpdaterAPI.GitHub
 	{
 		private WebClient WebClient = new WebClient();
 		private string UrlUpdateInfo = "";
+		private string UrlDowloadRoot = "";
+
 		private string RootPath = "";
+
+		private Exception ExceptionDowload;
+
+		private bool IsDowloadFile = false;
+		private bool IsCancel = false;
+		private int BlockTimeout = 50;
+
+		private InfoDowload InfoDowload = new InfoDowload();
+
 		/// <summary>
 		/// Если репозиторий приватный
 		/// </summary>
 		/// <param name="token"></param>
 		public void SetToken(string token)
 		{
-			WebClient WebClient = new WebClient();
+			WebClient = new WebClient();
 			WebClient.Headers.Add(HttpRequestHeader.UserAgent, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
 			WebClient.Headers.Add(HttpRequestHeader.Authorization, $"token {token}");
 			WebClient.Headers.Add(HttpRequestHeader.Accept, "application/octet-stream");
+			Init();
 		}
+		private void Init()
+		{
+			WebClient.DownloadProgressChanged += WebClient_DownloadProgressChanged;
+			WebClient.DownloadFileCompleted += WebClient_DownloadFileCompleted;
+		}
+
+		private void WebClient_DownloadFileCompleted(object? sender, System.ComponentModel.AsyncCompletedEventArgs e)
+		{
+			ExceptionDowload = e.Error;
+			IsDowloadFile = false;
+		}
+
+		private void WebClient_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+		{
+			
+		}
+
 		/// <summary>
 		/// url до файла на github в котором лежит xml
 		/// </summary>
@@ -37,6 +66,7 @@ namespace UpdaterAPI.GitHub
 			if (!url.Contains("https://raw.githubusercontent.com/"))
 				url = $"https://raw.githubusercontent.com/{url}";
 			UrlUpdateInfo = url;
+			Init();
 		}
 		/// <summary>
 		/// путь к приложению которое будет обновляться
@@ -45,6 +75,12 @@ namespace UpdaterAPI.GitHub
 		public void SetRootPath(string path)
 		{
 			RootPath = path;
+		}
+		public void SetUrlDowloadRoot(string url)
+		{
+			if (!url.Contains("https://raw.githubusercontent.com/"))
+				url = $"https://raw.githubusercontent.com/{url}";
+			UrlDowloadRoot = url;
 		}
 		public UpdateInfo GetUpdateInfo()
 		{
@@ -63,15 +99,44 @@ namespace UpdaterAPI.GitHub
 			var info = GetUpdateInfo();
 			return info.GetVersion(info.GetLastVersion(type, custom_type).Version, type);
 		}
-		public void UpdateFiles(string version, TypeVersion type, string custon_type = null)
+		public IEnumerable<InfoDowload> UpdateFiles(string version, TypeVersion type, string custon_type = null)
 		{
 			var info = GetUpdateInfo();
 			var get_version = info.GetVersion(version, type, custon_type);
 			foreach (var i in get_version.Files)
 			{
 				if (i.Hash != Checksum.GetMD5($"{RootPath}{i.Path}"))
-					Console.WriteLine($"{i.Hash} | {Checksum.GetMD5($"{RootPath}{i.Path}")} | {i.Path} | {i.Url}");
+				{
+					string path_to_file = $"{RootPath}{i.Path}";
+					Console.WriteLine($"{i.Hash} | {Checksum.GetMD5(path_to_file)} | {i.Path} | {i.Url}");
+					IsDowloadFile = true;
+					InfoDowload.SizeFile = i.Size;
+					InfoDowload.Path = path_to_file;
+					InfoDowload.Name = new System.IO.FileInfo(path_to_file).Name;
+					ExceptionDowload = null;
+					WebClient.DownloadFileAsync(new Uri(i.Url), path_to_file);
+
+					while (IsDowloadFile)
+					{
+						Thread.Sleep(BlockTimeout);
+						if (IsCancel)
+							break;
+						yield return InfoDowload;
+					}
+
+					if (IsCancel)
+						break;
+					if (ExceptionDowload != null)
+					{
+						throw new Exception($"Error dowload: {ExceptionDowload}");
+					}
+				}
 			}
+		}
+
+		public void CancelDowload()
+		{
+			WebClient.CancelAsync();
 		}
 	}
 }
