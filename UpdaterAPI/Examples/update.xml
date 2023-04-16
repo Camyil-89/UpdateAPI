@@ -15,11 +15,11 @@
 			<Files>
 				<FileInfo>
 					<Path>\test.dll</Path>
-					<Url>test.dll</Url>
+					<Url>Test.dll</Url>
 					<Hash>7f57177f04528512ebefd4da45011e67</Hash>
 				</FileInfo>
 				<FileInfo>
-					<Path>test.exe</Path>
+					<Path>Test.exe</Path>
 					<Url>13123asd</Url>
 					<Hash>efe5efe521739d30b5c6c6462b1fb7c2</Hash>
 				</FileInfo>

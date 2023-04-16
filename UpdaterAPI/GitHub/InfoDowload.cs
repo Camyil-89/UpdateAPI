@@ -13,5 +13,7 @@ namespace UpdaterAPI.GitHub
 		public long SizeFile { get; set; }
 		public string Path { get; set; }
 		public string Name { get; set; }
+		public int PercentageDowload { get; set; }
+		public bool IsDowload { get; set; } = false;
 	}
 }

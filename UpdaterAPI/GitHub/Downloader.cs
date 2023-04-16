@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -23,6 +24,7 @@ namespace UpdaterAPI.GitHub
 		private Exception ExceptionDowload;
 
 		private bool IsDowloadFile = false;
+		private Stopwatch Stopwatch = new Stopwatch();
 		private bool IsCancel = false;
 		private int BlockTimeout = 50;
 
@@ -50,11 +52,15 @@ namespace UpdaterAPI.GitHub
 		{
 			ExceptionDowload = e.Error;
 			IsDowloadFile = false;
+			Stopwatch.Stop();
 		}
 
 		private void WebClient_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
 		{
-			
+			InfoDowload.SpeedDowload = (long)((double)e.BytesReceived / Stopwatch.Elapsed.TotalSeconds);
+			InfoDowload.PercentageDowload = e.ProgressPercentage;
+			InfoDowload.TotalDowload = e.BytesReceived;
+			InfoDowload.SizeFile = e.TotalBytesToReceive;
 		}
 
 		/// <summary>
@@ -80,6 +86,9 @@ namespace UpdaterAPI.GitHub
 		{
 			if (!url.Contains("https://raw.githubusercontent.com/"))
 				url = $"https://raw.githubusercontent.com/{url}";
+
+			if (url.Last() != '/')
+				url += "/";
 			UrlDowloadRoot = url;
 		}
 		public UpdateInfo GetUpdateInfo()
@@ -114,8 +123,9 @@ namespace UpdaterAPI.GitHub
 					InfoDowload.Path = path_to_file;
 					InfoDowload.Name = new System.IO.FileInfo(path_to_file).Name;
 					ExceptionDowload = null;
-					WebClient.DownloadFileAsync(new Uri(i.Url), path_to_file);
-
+					Stopwatch.Restart();
+					WebClient.DownloadFileAsync(new Uri($"{UrlDowloadRoot}{i.Url}"), path_to_file);
+					Console.WriteLine($"{UrlDowloadRoot}{i.Url}");
 					while (IsDowloadFile)
 					{
 						Thread.Sleep(BlockTimeout);
@@ -130,6 +140,8 @@ namespace UpdaterAPI.GitHub
 					{
 						throw new Exception($"Error dowload: {ExceptionDowload}");
 					}
+					InfoDowload.IsDowload = true;
+					yield return InfoDowload;
 				}
 			}
 		}
