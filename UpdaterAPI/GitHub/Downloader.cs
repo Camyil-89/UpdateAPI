@@ -125,7 +125,6 @@ namespace UpdaterAPI.GitHub
 					ExceptionDowload = null;
 					Stopwatch.Restart();
 					WebClient.DownloadFileAsync(new Uri($"{UrlDowloadRoot}{i.Url}"), path_to_file);
-					Console.WriteLine($"{UrlDowloadRoot}{i.Url}");
 					while (IsDowloadFile)
 					{
 						Thread.Sleep(BlockTimeout);
