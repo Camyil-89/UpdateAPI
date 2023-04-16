@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using UpdaterAPI.Service;
 
 namespace UpdaterAPI.Models
 {
@@ -22,21 +23,14 @@ namespace UpdaterAPI.Models
 		public DateTime Date { get; set; } = DateTime.Now;
 
 		public List<FileInfo> Files { get; set; } = new List<FileInfo>();
-
-		private string GetFileChecksum(string filePath)
-		{
-			using (var md5 = MD5.Create())
-			{
-				using (var stream = File.OpenRead(filePath))
-				{
-					var hash = md5.ComputeHash(stream);
-					return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-				}
-			}
-		}
 		public void AddFile(string path, string root_path, string url)
 		{
-			Files.Add(new FileInfo() { Url = url, Path = path.Replace(root_path, ""), Hash = GetFileChecksum(path) });
+			var FileInfo = new FileInfo();
+			FileInfo.Path = path;
+			FileInfo.Url = url;
+			FileInfo.Hash = Checksum.GetMD5(path);
+			FileInfo.Size = new System.IO.FileInfo(path).Length;
+			Files.Add(FileInfo);
 		}
 	}
 }

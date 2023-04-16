@@ -14,5 +14,6 @@ namespace UpdaterAPI.Models
 		public string Path { get; set; }
 		public string Url { get; set; }
 		public string Hash { get; set; }
+		public long Size { get; set; }
 	}
 }

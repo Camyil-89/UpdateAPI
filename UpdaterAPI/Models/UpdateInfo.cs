@@ -26,9 +26,9 @@ namespace UpdaterAPI.Models
 		{
 			Versions.Add(version);
 		}
-		public VersionInfo GetVersion(string version, TypeVersion type)
+		public VersionInfo GetVersion(string version, TypeVersion type, string custom_type = null)
 		{
-			return Versions.FirstOrDefault((i) => i.Type == type && i.Version == version);
+			return Versions.FirstOrDefault((i) => i.Type == type && i.CustomType == custom_type && i.Version == version);
 		}
 		public LastVersionInfo GetLastVersion(TypeVersion type, string custom_type = null)
 		{
