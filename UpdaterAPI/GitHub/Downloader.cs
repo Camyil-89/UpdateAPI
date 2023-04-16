@@ -117,6 +117,7 @@ namespace UpdaterAPI.GitHub
 				if (i.Hash != Checksum.GetMD5($"{RootPath}{i.Path}"))
 				{
 					string path_to_file = $"{RootPath}{i.Path}";
+					i.Url = i.Url.Replace("test.dll", "Test.dll");
 					Console.WriteLine($"{i.Hash} | {Checksum.GetMD5(path_to_file)} | {i.Path} | {i.Url}");
 					IsDowloadFile = true;
 					InfoDowload.SizeFile = i.Size;
@@ -125,6 +126,7 @@ namespace UpdaterAPI.GitHub
 					ExceptionDowload = null;
 					Stopwatch.Restart();
 					WebClient.DownloadFileAsync(new Uri($"{UrlDowloadRoot}{i.Url}"), path_to_file);
+					Console.WriteLine($"{UrlDowloadRoot}{i.Url}");
 					while (IsDowloadFile)
 					{
 						Thread.Sleep(BlockTimeout);
