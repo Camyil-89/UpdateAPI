@@ -28,6 +28,7 @@ namespace UpdaterAPI.GitHub
 		private bool IsCancel = false;
 		private int BlockTimeout = 50;
 
+		private List<string> DowloadFiles = new List<string>();
 		private InfoDowload InfoDowload = new InfoDowload();
 
 		/// <summary>
@@ -82,6 +83,10 @@ namespace UpdaterAPI.GitHub
 		{
 			RootPath = path;
 		}
+		/// <summary>
+		/// Путь до папки на гитхабе где лежат все версии.
+		/// </summary>
+		/// <param name="url"></param>
 		public void SetUrlDowloadRoot(string url)
 		{
 			if (!url.Contains("https://raw.githubusercontent.com/"))
@@ -91,6 +96,10 @@ namespace UpdaterAPI.GitHub
 				url += "/";
 			UrlDowloadRoot = url;
 		}
+		/// <summary>
+		/// Получает информацию об версиях
+		/// </summary>
+		/// <returns></returns>
 		public UpdateInfo GetUpdateInfo()
 		{
 			using (MemoryStream sw = new MemoryStream(Encoding.UTF8.GetBytes(WebClient.DownloadString(UrlUpdateInfo))))
@@ -99,26 +108,50 @@ namespace UpdaterAPI.GitHub
 				return (UpdateInfo)xmls.Deserialize(sw);
 			}
 		}
+		/// <summary>
+		/// Получает информацию о последней версии выбранного типа
+		/// </summary>
+		/// <param name="type"></param>
+		/// <param name="custom_type"></param>
+		/// <returns></returns>
 		public LastVersionInfo GetLastVersionInfo(TypeVersion type, string custom_type = null)
 		{
 			return GetUpdateInfo().GetLastVersion(type, custom_type);
 		}
+		/// <summary>
+		/// Получает последнию версию программы выбранного типа
+		/// </summary>
+		/// <param name="type"></param>
+		/// <param name="custom_type"></param>
+		/// <returns></returns>
 		public VersionInfo GetLastVerison(TypeVersion type, string custom_type = null)
 		{
 			var info = GetUpdateInfo();
 			return info.GetVersion(info.GetLastVersion(type, custom_type).Version, type);
 		}
-		public IEnumerable<InfoDowload> UpdateFiles(string version, TypeVersion type, string custon_type = null)
+		/// <summary>
+		/// Скачивает файлы с гитхаба
+		/// </summary>
+		/// <param name="version">Версия которую необходимо скачать</param>
+		/// <param name="type">Тип версии которую качаем</param>
+		/// <param name="path_tmp_folder">Временная папка куда скачиваются все файлы, она нужно чтобы в случаи ошибки при скачивании ее удалить.</param>
+		/// <param name="custon_type">Кастомный тип версии</param>
+		/// <returns></returns>
+		/// <exception cref="Exception"></exception>
+		public IEnumerable<InfoDowload> UpdateFiles(string version, TypeVersion type, string path_tmp_folder, string custon_type = null)
 		{
+			DowloadFiles.Clear();
+			Directory.CreateDirectory(path_tmp_folder);
 			var info = GetUpdateInfo();
 			var get_version = info.GetVersion(version, type, custon_type);
 			foreach (var i in get_version.Files)
 			{
-				if (i.Hash != Checksum.GetMD5($"{RootPath}{i.Path}"))
+				if (!File.Exists($"{RootPath}{i.Path}") || i.Hash != Checksum.GetMD5($"{RootPath}{i.Path}"))
 				{
-					string path_to_file = $"{RootPath}{i.Path}";
-					Console.WriteLine($"{i.Hash} | {Checksum.GetMD5(path_to_file)} | {i.Path} | {i.Url}");
+					string path_to_file = $"{path_tmp_folder}{i.Path}";
+					Directory.CreateDirectory(Path.GetDirectoryName(path_to_file));
 					IsDowloadFile = true;
+					InfoDowload.IsDowload = false;
 					InfoDowload.SizeFile = i.Size;
 					InfoDowload.Path = path_to_file;
 					InfoDowload.Name = new System.IO.FileInfo(path_to_file).Name;
@@ -140,11 +173,28 @@ namespace UpdaterAPI.GitHub
 						throw new Exception($"Error dowload: {ExceptionDowload}");
 					}
 					InfoDowload.IsDowload = true;
+					DowloadFiles.Add(path_to_file);
 					yield return InfoDowload;
 				}
 			}
 		}
-
+		/// <summary>
+		/// Копирует файлы с временной папки. Копируется вся структура в этой папке.
+		/// </summary>
+		/// <param name="path_folder_update">Путь до временной папки</param>
+		/// <param name="before_command">Команды которые выполняться в cmd до копирования. В начале обязательно нужно написать "&&"</param>
+		/// <param name="after_command">Команды которые выполняться в cmd после копирования. В начале обязательно нужно написать "&&"</param>
+		public void CopyFilesFromTempDirectory(string path_folder_update, string before_command = "", string after_command = "")
+		{
+			Process cmd = new Process();
+			cmd.StartInfo.FileName = "cmd.exe";
+			cmd.StartInfo.Arguments = $"/c {before_command} xcopy /y /s \"{path_folder_update}\" \"{RootPath}\" {after_command}";
+			cmd.StartInfo.CreateNoWindow = true;
+			cmd.Start();
+		}
+		/// <summary>
+		/// Отменяет скачивания
+		/// </summary>
 		public void CancelDowload()
 		{
 			WebClient.CancelAsync();

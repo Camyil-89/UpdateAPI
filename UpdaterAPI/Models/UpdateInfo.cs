@@ -22,14 +22,34 @@ namespace UpdaterAPI.Models
 			}
 			LastVersions.Add(new LastVersionInfo() { Version = version, Date = date, Type = type, CustomType = custom_type });
 		}
+		/// <summary>
+		/// Добавляет новую версию
+		/// </summary>
+		/// <param name="version"></param>
 		public void AddNewVersion(VersionInfo version)
 		{
-			Versions.Add(version);
+			if (GetVersion(version.Version, version.Type, version.CustomType) == null)
+				Versions.Add(version);
+			else
+				throw new Exception("Такая версия уже существует!");
 		}
+		/// <summary>
+		/// Получает версию
+		/// </summary>
+		/// <param name="version">Версия</param>
+		/// <param name="type">Тип версии</param>
+		/// <param name="custom_type">Кастомный тип версии</param>
+		/// <returns></returns>
 		public VersionInfo GetVersion(string version, TypeVersion type, string custom_type = null)
 		{
 			return Versions.FirstOrDefault((i) => i.Type == type && i.CustomType == custom_type && i.Version == version);
 		}
+		/// <summary>
+		/// Получает информацию о последней версии
+		/// </summary>
+		/// <param name="type">Тип версии</param>
+		/// <param name="custom_type">Кастомный тип версии</param>
+		/// <returns></returns>
 		public LastVersionInfo GetLastVersion(TypeVersion type, string custom_type = null)
 		{
 			return LastVersions.FirstOrDefault((i) => i.Type == type && i.CustomType == custom_type);

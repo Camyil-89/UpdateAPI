@@ -23,10 +23,19 @@ namespace UpdaterAPI.Models
 		public DateTime Date { get; set; } = DateTime.Now;
 
 		public List<FileInfo> Files { get; set; } = new List<FileInfo>();
-		public void AddFile(string path, string root_path, string url)
+
+		/// <summary>
+		/// Добавляет файл в версию
+		/// </summary>
+		/// <param name="path">Путь до файла</param>
+		/// <param name="local_path">Локальный путь в проекте (приложении)</param>
+		/// <param name="url">Условный путь на гитхабе относительно UrlDowloadRoot. ОБЯЗАТЕЛЬНО УЧИТЫВАТЬ РЕГИСТР</param>
+		public void AddFile(string path, string local_path, string url)
 		{
+			if (local_path.First() != '\\')
+				local_path = $"\\{local_path}";
 			var FileInfo = new FileInfo();
-			FileInfo.Path = path;
+			FileInfo.Path = local_path;
 			FileInfo.Url = url;
 			FileInfo.Hash = Checksum.GetMD5(path);
 			FileInfo.Size = new System.IO.FileInfo(path).Length;
