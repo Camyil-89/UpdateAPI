@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace UpdaterAPI.Models
 {
@@ -13,6 +15,9 @@ namespace UpdaterAPI.Models
 
 		public void SetLastVersion(string version, TypeVersion type, DateTime date, string custom_type = null)
 		{
+			if (Versions.FirstOrDefault((i) => i.Version == version && i.Type == type && i.CustomType == custom_type) == null)
+				throw new Exception("Такой версии не существует!");
+
 			var last_version = LastVersions.FirstOrDefault((i) => i.Type == type);
 			if (last_version != null)
 			{
@@ -31,7 +36,7 @@ namespace UpdaterAPI.Models
 			if (GetVersion(version.Version, version.Type, version.CustomType) == null)
 				Versions.Add(version);
 			else
-				throw new Exception("Такая версия уже существует!");
+				throw new Exception($"Такая версия уже существует! {version.Version} {version.Type} {version.CustomType}");
 		}
 		/// <summary>
 		/// Получает версию
@@ -53,6 +58,15 @@ namespace UpdaterAPI.Models
 		public LastVersionInfo GetLastVersion(TypeVersion type, string custom_type = null)
 		{
 			return LastVersions.FirstOrDefault((i) => i.Type == type && i.CustomType == custom_type);
+		}
+
+		public static UpdateInfo Create(string data)
+		{
+			using (MemoryStream sw = new MemoryStream(Encoding.UTF8.GetBytes(data)))
+			{
+				XmlSerializer xmls = new XmlSerializer(typeof(UpdateInfo));
+				return (UpdateInfo)xmls.Deserialize(sw);
+			}
 		}
 	}
 }

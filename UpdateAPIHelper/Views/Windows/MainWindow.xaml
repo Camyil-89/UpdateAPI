@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UpdateAPIHelper"
         xmlns:vm="clr-namespace:UpdateAPIHelper.ViewsModels"
+		xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+		xmlns:CUI="clr-namespace:UpdateAPIHelper.UI"
         mc:Ignorable="d"
         Title="UpdateAPIHelper"
 		WindowStartupLocation="CenterScreen"
@@ -15,30 +17,103 @@
 		<vm:MainVM/>
 	</Window.DataContext>
 	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="30"/>
-			<RowDefinition/>
-		</Grid.RowDefinitions>
-		<Grid Grid.Row="0">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition/>
-				<ColumnDefinition/>
-			</Grid.ColumnDefinitions>
-			<Grid Grid.Column="1">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="75*"/>
-					<ColumnDefinition Width="25*"/>
-				</Grid.ColumnDefinitions>
-				<TextBox Grid.Column="0" FontSize="14" Height="25" Text="{Binding Settings.Parametrs.LastUrl}"/>
-				<Button Content="Загрузить" FontSize="14" Grid.Column="1" Margin="2"/>
-			</Grid>
-			<Grid Grid.Column="0">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="100"/>
-					<ColumnDefinition/>
-				</Grid.ColumnDefinitions>
-				<Button Content="Сформировать" Margin="2" Grid.Column="0"/>
-			</Grid>
-		</Grid>
+		<TabControl>
+			<TabItem Header="Файл обновлений">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="30"/>
+						<RowDefinition/>
+					</Grid.RowDefinitions>
+					<Grid Grid.Row="0">
+						<Grid >
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="75*"/>
+								<ColumnDefinition Width="10*"/>
+								<ColumnDefinition Width="10*"/>
+								<ColumnDefinition Width="15*"/>
+							</Grid.ColumnDefinitions>
+							<TextBox Grid.Column="0" FontSize="14" Height="25" Text="{Binding Settings.Parametrs.LastUrl}"/>
+							<Button Content="Загрузить" FontSize="14" Grid.Column="1" Margin="2" Command="{Binding DowloadUpdateInfoFromUrlCommand}"/>
+							<Button Content="Сбросить" FontSize="14" Grid.Column="2" Margin="2" Command="{Binding ResetUpdateInfoCommand}"/>
+							<Button Content="Использовать" FontSize="14" Grid.Column="3" Margin="2" Command="{Binding UseTextUpdateInfoCommand}"/>
+						</Grid>
+					</Grid>
+					<TextBox Grid.Row="1" FontSize="14" AcceptsReturn="True" AcceptsTab="True" Text="{Binding TextUpdateInfo, UpdateSourceTrigger=PropertyChanged}"/>
+				</Grid>
+			</TabItem>
+			<TabItem Header="Версии">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="50*"/>
+						<ColumnDefinition Width="50*"/>
+					</Grid.ColumnDefinitions>
+					<TreeView ItemsSource="{Binding TreeViewList}">
+						<i:Interaction.Behaviors>
+							<CUI:BindableSelectedItemBehavior SelectedItem="{Binding SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+						</i:Interaction.Behaviors>
+						<TreeView.ItemTemplate>
+							<HierarchicalDataTemplate ItemsSource="{Binding Items}">
+								<StackPanel Orientation="Horizontal">
+									<TextBlock Margin="5 0 0 0" FontSize="14" Text="{Binding Name}"/>
+								</StackPanel>
+							</HierarchicalDataTemplate>
+						</TreeView.ItemTemplate>
+					</TreeView>
+					<StackPanel Orientation="Vertical" Grid.Column="1" Margin="2">
+						<GroupBox Header="Новая версия" Visibility="{Binding VisibilityNewVersionInfo}" d:Visibility="Visible">
+							<StackPanel Orientation="Vertical">
+								<Grid Margin="2">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="70*"/>
+										<ColumnDefinition Width="30*"/>
+									</Grid.ColumnDefinitions>
+									<TextBlock FontSize="14" Text="Версия"/>
+									<TextBox Text="" FontSize="14" Grid.Column="1"/>
+								</Grid>
+								<Grid Margin="2">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="70*"/>
+										<ColumnDefinition Width="30*"/>
+									</Grid.ColumnDefinitions>
+									<TextBlock FontSize="14" Text="Тип версии"/>
+									<ComboBox Grid.Column="1" FontSize="14"/>
+								</Grid>
+								<Grid Margin="2">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="70*"/>
+										<ColumnDefinition Width="30*"/>
+									</Grid.ColumnDefinitions>
+									<TextBlock FontSize="14" Text="Кастомная версия"/>
+									<TextBox Text="" FontSize="14" Grid.Column="1"/>
+								</Grid>
+								<Grid Margin="2">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="70*"/>
+										<ColumnDefinition Width="30*"/>
+									</Grid.ColumnDefinitions>
+									<TextBlock FontSize="14" Text="Путь на гитхабе"/>
+									<TextBox Text="" FontSize="14" Grid.Column="1"/>
+								</Grid>
+								<Grid Margin="2">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="70*"/>
+										<ColumnDefinition Width="30*"/>
+									</Grid.ColumnDefinitions>
+									<Grid.RowDefinitions>
+										<RowDefinition/>
+										<RowDefinition/>
+									</Grid.RowDefinitions>
+									<TextBlock FontSize="14" Text="Выберите папку с файлами"/>
+									<Button Content="Выбрать" Grid.Column="1" FontSize="14"/>
+									<ListView Grid.ColumnSpan="2" Grid.Row="1" Height="200" Margin="0 4 0 0">
+										
+									</ListView>
+								</Grid>
+							</StackPanel>
+						</GroupBox>
+					</StackPanel>
+				</Grid>
+			</TabItem>
+		</TabControl>
 	</Grid>
 </Window>
