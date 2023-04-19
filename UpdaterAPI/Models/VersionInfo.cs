@@ -17,7 +17,16 @@ namespace UpdaterAPI.Models
 	}
 	public class VersionInfo
 	{
-		public string CustomType { get; set; }
+		private string _CustomType = null;
+		public string CustomType
+		{
+			get => _CustomType; set
+			{
+				if (value == "")
+					value = null;
+				_CustomType = value;
+			}
+		}
 		public TypeVersion Type { get; set; } = TypeVersion.Release;
 		public string Version { get; set; }
 		public DateTime Date { get; set; } = DateTime.Now;

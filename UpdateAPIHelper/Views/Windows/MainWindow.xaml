@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UpdateAPIHelper"
         xmlns:vm="clr-namespace:UpdateAPIHelper.ViewsModels"
+		xmlns:lang="clr-namespace:UpdateAPIHelper.Language"
 		xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
 		xmlns:CUI="clr-namespace:UpdateAPIHelper.UI"
         mc:Ignorable="d"
-        Title="UpdateAPIHelper"
+        Title="{Binding Settings.Version, StringFormat=UpdateAPIHelper {0}}"
 		WindowStartupLocation="CenterScreen"
 		Height="450"
 		Width="800"
@@ -18,7 +19,7 @@
 	</Window.DataContext>
 	<Grid>
 		<TabControl>
-			<TabItem Header="Файл обновлений">
+			<TabItem Header="{Binding Source={x:Static lang:LangProvider.Language}, Path=[UpdateFileMenu]}">
 				<Grid>
 					<Grid.RowDefinitions>
 						<RowDefinition Height="30"/>
@@ -33,33 +34,85 @@
 								<ColumnDefinition Width="15*"/>
 							</Grid.ColumnDefinitions>
 							<TextBox Grid.Column="0" FontSize="14" Height="25" Text="{Binding Settings.Parametrs.LastUrl}"/>
-							<Button Content="Загрузить" FontSize="14" Grid.Column="1" Margin="2" Command="{Binding DowloadUpdateInfoFromUrlCommand}"/>
-							<Button Content="Сбросить" FontSize="14" Grid.Column="2" Margin="2" Command="{Binding ResetUpdateInfoCommand}"/>
-							<Button Content="Использовать" FontSize="14" Grid.Column="3" Margin="2" Command="{Binding UseTextUpdateInfoCommand}"/>
+							<Button Content="{Binding Source={x:Static lang:LangProvider.Language}, Path=[DowloadFromUrlBtn]}" FontSize="14" Grid.Column="1" Margin="2" Command="{Binding DowloadUpdateInfoFromUrlCommand}"/>
+							<Button Content="{Binding Source={x:Static lang:LangProvider.Language}, Path=[ResetBtn]}" FontSize="14" Grid.Column="2" Margin="2" Command="{Binding ResetUpdateInfoCommand}"/>
+							<Button Content="{Binding Source={x:Static lang:LangProvider.Language}, Path=[UseThisBtn]}" FontSize="14" Grid.Column="3" Margin="2" Command="{Binding UseTextUpdateInfoCommand}"/>
 						</Grid>
 					</Grid>
 					<TextBox Grid.Row="1" FontSize="14" AcceptsReturn="True" AcceptsTab="True" Text="{Binding TextUpdateInfo, UpdateSourceTrigger=PropertyChanged}"/>
 				</Grid>
 			</TabItem>
-			<TabItem Header="Версии">
+			<TabItem Header="{Binding Source={x:Static lang:LangProvider.Language}, Path=[VersionsInfoMenu]}">
 				<Grid>
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="50*"/>
 						<ColumnDefinition Width="50*"/>
 					</Grid.ColumnDefinitions>
-					<TreeView ItemsSource="{Binding TreeViewList}">
+					<TreeView ItemsSource="{Binding TreeViewList}" FontSize="14">
 						<i:Interaction.Behaviors>
-							<CUI:BindableSelectedItemBehavior SelectedItem="{Binding SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+							<CUI:BindableSelectedItemBehavior SelectedItem="{Binding SelectedItemTreeViewItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 						</i:Interaction.Behaviors>
-						<TreeView.ItemTemplate>
-							<HierarchicalDataTemplate ItemsSource="{Binding Items}">
-								<StackPanel Orientation="Horizontal">
-									<TextBlock Margin="5 0 0 0" FontSize="14" Text="{Binding Name}"/>
-								</StackPanel>
-							</HierarchicalDataTemplate>
-						</TreeView.ItemTemplate>
 					</TreeView>
 					<StackPanel Orientation="Vertical" Grid.Column="1" Margin="2">
+						<GroupBox Header="Последняя версия" d:Visibility="Visible" Visibility="{Binding VisibilityLastVersionInfo}">
+							<StackPanel Orientation="Vertical">
+								<Grid Margin="2">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="70*"/>
+										<ColumnDefinition Width="30*"/>
+									</Grid.ColumnDefinitions>
+									<TextBlock FontSize="14" Text="Версия"/>
+									<TextBox Text="{Binding VersionInfoVersion, UpdateSourceTrigger=PropertyChanged}" FontSize="14" Grid.Column="1"/>
+								</Grid>
+								<Grid Margin="2">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="70*"/>
+										<ColumnDefinition Width="30*"/>
+									</Grid.ColumnDefinitions>
+									<TextBlock FontSize="14" Text="Тип версии"/>
+									<ComboBox Grid.Column="1" FontSize="14"
+											  ItemsSource="{Binding VersionInfoTypes}"
+											  DisplayMemberPath="Value"
+											  SelectedValuePath="Key"
+											  SelectedValue="{Binding VersionInfoType}"/>
+								</Grid>
+								<Grid Margin="2">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="70*"/>
+										<ColumnDefinition Width="30*"/>
+									</Grid.ColumnDefinitions>
+									<TextBlock FontSize="14" Text="Кастомная версия"/>
+									<TextBox Text="{Binding VersionInfoCustomType, UpdateSourceTrigger=PropertyChanged}" FontSize="14" Grid.Column="1"/>
+								</Grid>
+								<Grid Margin="2">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="70*"/>
+										<ColumnDefinition Width="30*"/>
+									</Grid.ColumnDefinitions>
+									<TextBlock FontSize="14" Text="Дата"/>
+									<DatePicker SelectedDate="{Binding VersionInfoDate}" Grid.Column="1" SelectedDateFormat="Short"/>
+								</Grid>
+								<StackPanel Margin="2" Orientation="Horizontal">
+									<Button Width="120" Content="Добавить" FontSize="14" Margin="2" HorizontalAlignment="Left" Command="{Binding AddLastVersionInfoCommand}"/>
+									<Button Width="120" Content="Удалить" FontSize="14" Margin="2" HorizontalAlignment="Left" Command="{Binding DeleteLastVersionInfoCommand}"/>
+								</StackPanel>
+							</StackPanel>
+						</GroupBox>
+						<GroupBox Visibility="{Binding VisibilityAboutVersionInfo}" d:Visibility="Visible">
+							<GroupBox.Header>
+								<StackPanel Orientation="Horizontal">
+									<TextBlock Text="Версия "/>
+									<TextBlock Text="{Binding AboutVersionInfoText}"/>
+								</StackPanel>
+							</GroupBox.Header>
+							<Grid>
+								<StackPanel Orientation="Vertical">
+									<StackPanel Orientation="Horizontal" Margin="2">
+										<Button Content="Удалить" FontSize="14" Width="120" Command="{Binding DeleteVersionInfoCommand}"/>
+									</StackPanel>
+								</StackPanel>
+							</Grid>
+						</GroupBox>
 						<GroupBox Header="Новая версия" Visibility="{Binding VisibilityNewVersionInfo}" d:Visibility="Visible">
 							<StackPanel Orientation="Vertical">
 								<Grid Margin="2">
@@ -68,7 +121,7 @@
 										<ColumnDefinition Width="30*"/>
 									</Grid.ColumnDefinitions>
 									<TextBlock FontSize="14" Text="Версия"/>
-									<TextBox Text="" FontSize="14" Grid.Column="1"/>
+									<TextBox Text="{Binding VersionInfoVersion, UpdateSourceTrigger=PropertyChanged}" FontSize="14" Grid.Column="1"/>
 								</Grid>
 								<Grid Margin="2">
 									<Grid.ColumnDefinitions>
@@ -76,7 +129,11 @@
 										<ColumnDefinition Width="30*"/>
 									</Grid.ColumnDefinitions>
 									<TextBlock FontSize="14" Text="Тип версии"/>
-									<ComboBox Grid.Column="1" FontSize="14"/>
+									<ComboBox Grid.Column="1" FontSize="14"
+											  ItemsSource="{Binding VersionInfoTypes}"
+											  DisplayMemberPath="Value"
+											  SelectedValuePath="Key"
+											  SelectedValue="{Binding VersionInfoType}"/>
 								</Grid>
 								<Grid Margin="2">
 									<Grid.ColumnDefinitions>
@@ -84,15 +141,15 @@
 										<ColumnDefinition Width="30*"/>
 									</Grid.ColumnDefinitions>
 									<TextBlock FontSize="14" Text="Кастомная версия"/>
-									<TextBox Text="" FontSize="14" Grid.Column="1"/>
+									<TextBox Text="{Binding VersionInfoCustomType, UpdateSourceTrigger=PropertyChanged}" FontSize="14" Grid.Column="1"/>
 								</Grid>
 								<Grid Margin="2">
 									<Grid.ColumnDefinitions>
 										<ColumnDefinition Width="70*"/>
 										<ColumnDefinition Width="30*"/>
 									</Grid.ColumnDefinitions>
-									<TextBlock FontSize="14" Text="Путь на гитхабе"/>
-									<TextBox Text="" FontSize="14" Grid.Column="1"/>
+									<TextBlock FontSize="14" Text="Дата"/>
+									<DatePicker SelectedDate="{Binding VersionInfoDate}" Grid.Column="1" SelectedDateFormat="Short"/>
 								</Grid>
 								<Grid Margin="2">
 									<Grid.ColumnDefinitions>
@@ -104,14 +161,56 @@
 										<RowDefinition/>
 									</Grid.RowDefinitions>
 									<TextBlock FontSize="14" Text="Выберите папку с файлами"/>
-									<Button Content="Выбрать" Grid.Column="1" FontSize="14"/>
-									<ListView Grid.ColumnSpan="2" Grid.Row="1" Height="200" Margin="0 4 0 0">
-										
+									<Button Content="Выбрать" Grid.Column="1" FontSize="14" Command="{Binding AddFilesCommand}"/>
+									<ListView Grid.ColumnSpan="2" Grid.Row="1" Height="200" Margin="0 4 0 0" 
+											  SelectedItem="{Binding SelectedVersionInfo}" ItemsSource="{Binding ViewFilesInfo}"
+											  FontSize="14">
+										<ListView.ContextMenu>
+											<ContextMenu>
+												<MenuItem Header="Удалить" Command="{Binding RemovePathFileCommand}"/>
+											</ContextMenu>
+										</ListView.ContextMenu>
+										<ListView.ItemTemplate>
+											<DataTemplate>
+												<StackPanel Orientation="Horizontal">
+													<TextBlock Text="{Binding Path}"/>
+												</StackPanel>
+											</DataTemplate>
+										</ListView.ItemTemplate>
 									</ListView>
+								</Grid>
+								<Grid Margin="2">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="90*"/>
+									</Grid.ColumnDefinitions>
+									<Button Content="Добавить" FontSize="14" Command="{Binding AddNewVerisonInfoCommand}"/>
+									<StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
+										<TextBlock Text="Количество файлов: " VerticalAlignment="Center" FontSize="14"/>
+										<TextBlock Text="{Binding ViewFilesInfo.Count}" VerticalAlignment="Center" FontSize="14"/>
+									</StackPanel>
 								</Grid>
 							</StackPanel>
 						</GroupBox>
 					</StackPanel>
+				</Grid>
+			</TabItem>
+			<TabItem Header="Экспорт">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="30"/>
+						<RowDefinition/>
+					</Grid.RowDefinitions>
+					<StackPanel Grid.Row="0" Orientation="Horizontal">
+						<Button Content="Экспорт в текст" FontSize="14" Width="120"
+								Command="{Binding ExportUpdateInfoToTextCommand}" Margin="2"/>
+						<Button Margin="2" Content="Копировать" FontSize="14"
+								Command="{Binding CopyToClipboardCommand}" Width="90"/>
+						<Button Margin="2" Content="Сохранить как" FontSize="14" Width="120" Command="{Binding SaveAsUpdateInfoTextCommand}" CommandParameter="0"/>
+						<Button Margin="2" Content="Сохранить как архив" FontSize="14" Width="160" Command="{Binding SaveAsUpdateInfoTextCommand}" CommandParameter="1"/>
+					</StackPanel>
+					<TextBox FontSize="14" Grid.Row="1" IsReadOnly="True" Text="{Binding ExportTextUpdateInfo}"
+							 VerticalScrollBarVisibility="Auto" AcceptsReturn="True" AcceptsTab="True"/>
 				</Grid>
 			</TabItem>
 		</TabControl>

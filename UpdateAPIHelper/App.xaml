@@ -2,8 +2,11 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:UpdateAPIHelper"
+             xmlns:lang="clr-namespace:UpdateAPIHelper.Language"
              StartupUri="Views\Windows\MainWindow.xaml">
     <Application.Resources>
-         
+		<ResourceDictionary>
+			<lang:LangProvider x:Key="Localization"/>
+		</ResourceDictionary>
     </Application.Resources>
 </Application>

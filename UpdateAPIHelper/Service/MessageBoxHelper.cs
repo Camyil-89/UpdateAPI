@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -9,7 +11,18 @@ namespace UpdateAPIHelper.Service
 {
 	public class MessageBoxHelper
 	{
-
+		public static void BallonTip(string text, int timeout = 2000, System.Windows.Forms.ToolTipIcon tipIcon = System.Windows.Forms.ToolTipIcon.Info)
+		{
+			Task.Run(() =>
+			{
+				var notifyIcon = new System.Windows.Forms.NotifyIcon();
+				notifyIcon.Visible = true;
+				notifyIcon.Icon = System.Drawing.Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
+				notifyIcon.ShowBalloonTip(timeout, "UpdateAPIHelper", text, tipIcon);
+				Thread.Sleep(timeout);
+				notifyIcon.Dispose();
+			});
+		}
 		/// <summary>
 		/// Окно сообщения содержит символ, состоящий из восклицательного знака в треугольнике
 		///     с желтым фоном.

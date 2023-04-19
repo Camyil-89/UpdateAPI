@@ -15,7 +15,7 @@ namespace UpdaterAPI.Models
 
 		public void SetLastVersion(string version, TypeVersion type, DateTime date, string custom_type = null)
 		{
-			if (Versions.FirstOrDefault((i) => i.Version == version && i.Type == type && i.CustomType == custom_type) == null)
+			if (GetVersion(version, type, custom_type) == null)
 				throw new Exception("Такой версии не существует!");
 
 			var last_version = LastVersions.FirstOrDefault((i) => i.Type == type);
@@ -59,13 +59,35 @@ namespace UpdaterAPI.Models
 		{
 			return LastVersions.FirstOrDefault((i) => i.Type == type && i.CustomType == custom_type);
 		}
-
+		public void DeleteLastVersionInfo(TypeVersion type, string custom_type = null)
+		{
+			LastVersions.Remove(GetLastVersion(type, custom_type));
+		}
+		public void DeleteVersionInfo(VersionInfo version)
+		{
+			var last_version = GetLastVersion(version.Type, version.CustomType);
+			if (last_version.Version == version.Version)
+			{
+				LastVersions.Remove(last_version);
+			}
+			Versions.Remove(GetVersion(version.Version, version.Type, version.CustomType));
+		}
 		public static UpdateInfo Create(string data)
 		{
 			using (MemoryStream sw = new MemoryStream(Encoding.UTF8.GetBytes(data)))
 			{
 				XmlSerializer xmls = new XmlSerializer(typeof(UpdateInfo));
 				return (UpdateInfo)xmls.Deserialize(sw);
+			}
+		}
+		public override string ToString()
+		{
+			using (var ms = new MemoryStream())
+			{
+				XmlSerializer serializer = new XmlSerializer(this.GetType());
+				serializer.Serialize(ms, this);
+				ms.Seek(0, SeekOrigin.Begin);
+				return Encoding.UTF8.GetString(ms.ToArray());
 			}
 		}
 	}

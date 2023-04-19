@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -102,6 +103,21 @@ namespace UpdaterAPI.GitHub
 		/// <returns></returns>
 		public UpdateInfo GetUpdateInfo()
 		{
+			try
+			{
+				using (var archive = new ZipArchive(new MemoryStream(WebClient.DownloadData(UrlUpdateInfo))))
+				{
+					var file = archive.GetEntry($"{UrlUpdateInfo.Split('/').Last()}");
+					using (var stream = file.Open())
+					{
+						XmlSerializer xmls = new XmlSerializer(typeof(UpdateInfo));
+						var x = (UpdateInfo)xmls.Deserialize(stream);
+						return x;
+					}
+				}
+			}
+			catch { }
+
 			using (MemoryStream sw = new MemoryStream(Encoding.UTF8.GetBytes(WebClient.DownloadString(UrlUpdateInfo))))
 			{
 				XmlSerializer xmls = new XmlSerializer(typeof(UpdateInfo));
