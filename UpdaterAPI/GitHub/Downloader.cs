@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -26,11 +27,11 @@ namespace UpdaterAPI.GitHub
 
 		private bool IsDowloadFile = false;
 		private Stopwatch Stopwatch = new Stopwatch();
-		private bool IsCancel = false;
-		private int BlockTimeout = 50;
+		public int BlockTimeout = 50;
 
 		private List<string> DowloadFiles = new List<string>();
 		private InfoDowload InfoDowload = new InfoDowload();
+		private bool AbortDowload = false;
 
 		/// <summary>
 		/// Если репозиторий приватный
@@ -53,6 +54,8 @@ namespace UpdaterAPI.GitHub
 		private void WebClient_DownloadFileCompleted(object? sender, System.ComponentModel.AsyncCompletedEventArgs e)
 		{
 			ExceptionDowload = e.Error;
+			InfoDowload.TotalDowload = InfoDowload.SizeFile;
+			InfoDowload.PercentageDowload = 100;
 			IsDowloadFile = false;
 			Stopwatch.Stop();
 		}
@@ -60,9 +63,9 @@ namespace UpdaterAPI.GitHub
 		private void WebClient_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
 		{
 			InfoDowload.SpeedDowload = (long)((double)e.BytesReceived / Stopwatch.Elapsed.TotalSeconds);
-			InfoDowload.PercentageDowload = e.ProgressPercentage;
 			InfoDowload.TotalDowload = e.BytesReceived;
 			InfoDowload.SizeFile = e.TotalBytesToReceive;
+			InfoDowload.PercentageDowload = InfoDowload.TotalDowload / InfoDowload.SizeFile;
 		}
 
 		/// <summary>
@@ -149,26 +152,29 @@ namespace UpdaterAPI.GitHub
 		/// Скачивает файлы с гитхаба
 		/// </summary>
 		/// <param name="version">Версия которую необходимо скачать</param>
-		/// <param name="type">Тип версии которую качаем</param>
 		/// <param name="path_tmp_folder">Временная папка куда скачиваются все файлы, она нужно чтобы в случаи ошибки при скачивании ее удалить.</param>
-		/// <param name="custon_type">Кастомный тип версии</param>
 		/// <returns></returns>
 		/// <exception cref="Exception"></exception>
-		public IEnumerable<InfoDowload> UpdateFiles(string version, TypeVersion type, string path_tmp_folder, string custon_type = null)
+		public IEnumerable<InfoDowload> UpdateFiles(VersionInfo version, string path_tmp_folder)
 		{
+			AbortDowload = false;
 			DowloadFiles.Clear();
+			InfoDowload.FilesCount = version.Files.Count;
+			int now_file = 0;
 			Directory.CreateDirectory(path_tmp_folder);
-			var info = GetUpdateInfo();
-			var get_version = info.GetVersion(version, type, custon_type);
-			foreach (var i in get_version.Files)
+			foreach (var i in version.Files)
 			{
+				now_file++;
+				InfoDowload.NowFileIndex = now_file;
+				if (AbortDowload)
+					break;
 				if (!File.Exists($"{RootPath}{i.Path}") || i.Hash != Checksum.GetMD5($"{RootPath}{i.Path}"))
 				{
 					string path_to_file = $"{path_tmp_folder}{i.Path}";
 					Directory.CreateDirectory(Path.GetDirectoryName(path_to_file));
 					IsDowloadFile = true;
-					InfoDowload.IsDowload = false;
 					InfoDowload.SizeFile = i.Size;
+					InfoDowload.Type = TypeInfoDowload.DowloadFile;
 					InfoDowload.Path = path_to_file;
 					InfoDowload.Name = new System.IO.FileInfo(path_to_file).Name;
 					ExceptionDowload = null;
@@ -177,28 +183,48 @@ namespace UpdaterAPI.GitHub
 					while (IsDowloadFile)
 					{
 						Thread.Sleep(BlockTimeout);
-						if (IsCancel)
+						if (AbortDowload)
 							break;
 						yield return InfoDowload;
 					}
 
-					if (IsCancel)
+					if (AbortDowload)
 						break;
 					if (ExceptionDowload != null)
 					{
 						throw new Exception($"Error dowload: {ExceptionDowload}");
 					}
-					InfoDowload.IsDowload = true;
+					InfoDowload.Type = TypeInfoDowload.DowloadFileFinished;
 					DowloadFiles.Add(path_to_file);
 					yield return InfoDowload;
 				}
 			}
+			if (AbortDowload)
+				InfoDowload.Type = TypeInfoDowload.AbortDowload;
+			else
+				InfoDowload.Type = TypeInfoDowload.FinishedDownloading;
+			yield return InfoDowload;
 		}
 		/// <summary>
-		/// Копирует файлы с временной папки. Копируется вся структура в этой папке.
+		/// Скачивает файлы с гитхаба
+		/// </summary>
+		/// <param name="version">Версия которую необходимо скачать</param>
+		/// <param name="type">Тип версии которую качаем</param>
+		/// <param name="path_tmp_folder">Временная папка куда скачиваются все файлы, она нужно чтобы в случаи ошибки при скачивании ее удалить.</param>
+		/// <param name="custon_type">Кастомный тип версии</param>
+		/// <returns></returns>
+		/// <exception cref="Exception"></exception>
+		public IEnumerable<InfoDowload> UpdateFiles(string version, TypeVersion type, string path_tmp_folder, string custon_type = null)
+		{
+			var info = GetUpdateInfo();
+			foreach (var info_dowload in UpdateFiles(info.GetVersion(version, type, custon_type), path_tmp_folder))
+				yield return info_dowload;
+		}
+		/// <summary>
+		/// Копирует файлы с временной папки. Копируется вся структура в этой папке. В папку указанную в RootPath.
 		/// </summary>
 		/// <param name="path_folder_update">Путь до временной папки</param>
-		/// <param name="before_command">Команды которые выполняться в cmd до копирования. В начале обязательно нужно написать "&&"</param>
+		/// <param name="before_command">Команды которые выполняться в cmd до копирования. В начале конце нужно написать "&&"</param>
 		/// <param name="after_command">Команды которые выполняться в cmd после копирования. В начале обязательно нужно написать "&&"</param>
 		public void CopyFilesFromTempDirectory(string path_folder_update, string before_command = "", string after_command = "")
 		{
@@ -214,6 +240,7 @@ namespace UpdaterAPI.GitHub
 		public void CancelDowload()
 		{
 			WebClient.CancelAsync();
+			AbortDowload = true;
 		}
 	}
 }

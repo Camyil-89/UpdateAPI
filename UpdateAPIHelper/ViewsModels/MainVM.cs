@@ -279,8 +279,8 @@ namespace UpdateAPIHelper.ViewsModels
 					NewVersionInfo.Files.Clear();
 					foreach (var path in GetAllFilesInFolder(dialog.FileName))
 					{
-						var local_path = path.Replace($"{new DirectoryInfo(dialog.FileName).Parent.FullName}\\", "");
-						NewVersionInfo.AddFile(path, local_path, local_path);
+						var local_path = path.Replace($"{new DirectoryInfo(dialog.FileName).Parent.FullName}\\{dialog.FileName.Split("\\").Last()}", "");
+						NewVersionInfo.AddFile(path, local_path, path.Replace($"{new DirectoryInfo(dialog.FileName).Parent.FullName}\\", ""));
 					}
 					CreateViewFilesInfo();
 				}

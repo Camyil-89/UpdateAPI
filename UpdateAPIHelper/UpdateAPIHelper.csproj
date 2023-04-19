@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\UpdateAPIUI\UpdateAPIUI.csproj" />
     <ProjectReference Include="..\UpdaterAPI\UpdaterAPI.csproj" />
   </ItemGroup>
 
