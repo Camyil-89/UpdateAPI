@@ -40,6 +40,6 @@ foreach (var i in Downloader.UpdateFiles(Downloader.GetLastVerison(TypeVersion.R
 	Console.WriteLine($"{i.Path} | {i.Name} | {i.SizeFile} | {i.TotalDowload} | {i.SpeedDowload} | {i.PercentageDowload} | {i.Type}");
 }
 
-Downloader.CopyFilesFromTempDirectory(path_update);
+downloader.CopyFilesFromTempDirectory(tmp_path, $"taskkill /pid {Process.GetCurrentProcess().Id} &&", $"&& rmdir /s /q \"{Directory.GetCurrentDirectory()}\\update\" && \"{Process.GetCurrentProcess().MainModule.FileName.Split("\\").Last()}\"");
 
 ```
