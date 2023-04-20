@@ -1,6 +1,6 @@
 # UpdateAPI
 
-Пример кода для получения обновлений с (https://github.com/Camyil-89/UpdateAPI-Publish)
+Пример кода для получения обновлений с (https://github.com/Camyil-89/UpdateAPI-Publish) с использованием UI.
 ```cs
 UpdaterAPI.GitHub.Downloader downloader = new UpdaterAPI.GitHub.Downloader();
     downloader.SetRootPath(Directory.GetCurrentDirectory());
@@ -24,4 +24,22 @@ UpdaterAPI.GitHub.Downloader downloader = new UpdaterAPI.GitHub.Downloader();
 			}
 		});
 	}
+```
+
+Пример кода для получения обновлений с (https://github.com/Camyil-89/UpdateAPI-Publish)
+```cs
+Downloader Downloader = new Downloader();
+Downloader.SetUrlUpdateInfo("Camyil-89/UpdateAPI/dev/UpdaterAPI/Examples/UpdateInfo.xml");
+Downloader.SetRootPath("D:\\cs\\UpdaterAPI\\Test\\bin\\Debug\\net6.0\\test");
+Downloader.SetUrlDowloadRoot("Camyil-89/UpdateAPI/dev/UpdaterAPI/Examples/")
+
+var path_update = "D:\\cs\\UpdaterAPI\\Test\\bin\\Debug\\net6.0\\test\\update"
+
+foreach (var i in Downloader.UpdateFiles(Downloader.GetLastVerison(TypeVersion.Release).Version, TypeVersion.Release, path_update))
+{
+	Console.WriteLine($"{i.Path} | {i.Name} | {i.SizeFile} | {i.TotalDowload} | {i.SpeedDowload} | {i.PercentageDowload} | {i.IsDowload}");
+}
+
+Downloader.CopyFilesFromTempDirectory(path_update);
+
 ```
