@@ -1,8 +1,8 @@
 # UpdateAPI
 
 Пример кода для получения обновлений с (https://github.com/Camyil-89/UpdateAPI-Publish)
-
-    UpdaterAPI.GitHub.Downloader downloader = new UpdaterAPI.GitHub.Downloader();
+```cs
+UpdaterAPI.GitHub.Downloader downloader = new UpdaterAPI.GitHub.Downloader();
     downloader.SetRootPath(Directory.GetCurrentDirectory());
     downloader.SetUrlUpdateInfo("Camyil-89/UpdateAPI-Publish/main/UpdateInfo.xml");
     downloader.SetUrlDowloadRoot("Camyil-89/UpdateAPI-Publish/main/versions");
@@ -24,3 +24,4 @@
 			}
 		});
 	}
+```
