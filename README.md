@@ -37,7 +37,7 @@ var path_update = "D:\\cs\\UpdaterAPI\\Test\\bin\\Debug\\net6.0\\test\\update"
 
 foreach (var i in Downloader.UpdateFiles(Downloader.GetLastVerison(TypeVersion.Release).Version, TypeVersion.Release, path_update))
 {
-	Console.WriteLine($"{i.Path} | {i.Name} | {i.SizeFile} | {i.TotalDowload} | {i.SpeedDowload} | {i.PercentageDowload} | {i.IsDowload}");
+	Console.WriteLine($"{i.Path} | {i.Name} | {i.SizeFile} | {i.TotalDowload} | {i.SpeedDowload} | {i.PercentageDowload} | {i.Type}");
 }
 
 Downloader.CopyFilesFromTempDirectory(path_update);
