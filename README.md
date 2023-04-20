@@ -33,7 +33,7 @@ downloader.SetRootPath(Directory.GetCurrentDirectory());
 downloader.SetUrlUpdateInfo("Camyil-89/UpdateAPI-Publish/main/UpdateInfo.xml");
 downloader.SetUrlDowloadRoot("Camyil-89/UpdateAPI-Publish/main/versions");
 
-var path_update = "D:\\cs\\UpdaterAPI\\Test\\bin\\Debug\\net6.0\\test\\update"
+var path_update =  $"{Directory.GetCurrentDirectory()}\\update";
 
 foreach (var i in Downloader.UpdateFiles(Downloader.GetLastVerison(TypeVersion.Release).Version, TypeVersion.Release, path_update))
 {
