@@ -1,6 +1,7 @@
 # UpdateAPI
 
-Пример кода для получения обновлений с (https://github.com/Camyil-89/UpdateAPI-Publish) с использованием UI.
+## Example UI
+Use UpdateInfo from (https://github.com/Camyil-89/UpdateAPI-Publish).
 ```cs
 UpdaterAPI.GitHub.Downloader downloader = new UpdaterAPI.GitHub.Downloader();
 downloader.SetRootPath(Directory.GetCurrentDirectory());
@@ -25,8 +26,8 @@ if (last_version.Version != Settings.Instance.Version && MessageBoxHelper.Questi
 	});
 }
 ```
-
-Пример кода для получения обновлений с (https://github.com/Camyil-89/UpdateAPI-Publish)
+## Example
+Use UpdateInfo from (https://github.com/Camyil-89/UpdateAPI-Publish).
 ```cs
 Downloader Downloader = new Downloader();
 downloader.SetRootPath(Directory.GetCurrentDirectory());
