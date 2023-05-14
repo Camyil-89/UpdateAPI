@@ -11,7 +11,7 @@
         mc:Ignorable="d"
         Title="{Binding Settings.Version, StringFormat=UpdateAPIHelper {0}}"
 		WindowStartupLocation="CenterScreen"
-		Height="450"
+		Height="600"
 		Width="800"
 		ResizeMode="CanMinimize">
 	<Window.DataContext>
@@ -76,7 +76,19 @@
 											  SelectedValuePath="Key"
 											  SelectedValue="{Binding VersionInfoType}"/>
 								</Grid>
-								<Grid Margin="2">
+                                <Grid Margin="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="70*"/>
+                                        <ColumnDefinition Width="30*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock FontSize="14" Text="Тип системы"/>
+                                    <ComboBox Grid.Column="1" FontSize="14"
+											  ItemsSource="{Binding SystemTypes}"
+											  DisplayMemberPath="Value"
+											  SelectedValuePath="Key"
+											  SelectedValue="{Binding TypeSystemInfo}"/>
+                                </Grid>
+                                <Grid Margin="2">
 									<Grid.ColumnDefinitions>
 										<ColumnDefinition Width="70*"/>
 										<ColumnDefinition Width="30*"/>
@@ -135,6 +147,18 @@
 											  SelectedValuePath="Key"
 											  SelectedValue="{Binding VersionInfoType}"/>
 								</Grid>
+                                <Grid Margin="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="70*"/>
+                                        <ColumnDefinition Width="30*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock FontSize="14" Text="Тип системы"/>
+                                    <ComboBox Grid.Column="1" FontSize="14"
+											  ItemsSource="{Binding SystemTypes}"
+											  DisplayMemberPath="Value"
+											  SelectedValuePath="Key"
+											  SelectedValue="{Binding TypeSystemInfo}"/>
+                                </Grid>
 								<Grid Margin="2">
 									<Grid.ColumnDefinitions>
 										<ColumnDefinition Width="70*"/>

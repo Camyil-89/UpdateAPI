@@ -28,11 +28,18 @@ namespace UpdateAPIUI.ViewsModels.Windows
 			#endregion
 		}
 
-		public bool WaitEndDowload = false;
+		public bool WaitEndDowload = true;
 		#region Parametrs
 		public SimpleInstallerWindow Window;
 
 		public StatusDowload StatusDowload = StatusDowload.Error;
+
+		#region WindowStyle: Description
+		/// <summary>Description</summary>
+		private Models.WindowStyle _WindowStyle = new Models.WindowStyle();
+		/// <summary>Description</summary>
+		public Models.WindowStyle WindowStyle { get => _WindowStyle; set => Set(ref _WindowStyle, value); }
+		#endregion
 
 		#region Language: Description
 		/// <summary>Description</summary>

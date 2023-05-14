@@ -8,6 +8,12 @@ using UpdaterAPI.Service;
 
 namespace UpdaterAPI.Models
 {
+	public enum TypeSystem: byte
+	{
+		x64 = 64,
+		x86 = 32,
+		ARM = 1,
+	}
 	public enum TypeVersion : byte
 	{
 		Release = 0,
@@ -28,6 +34,7 @@ namespace UpdaterAPI.Models
 			}
 		}
 		public TypeVersion Type { get; set; } = TypeVersion.Release;
+		public TypeSystem TypeSystem { get; set; } = TypeSystem.x64;
 		public string Version { get; set; }
 		public DateTime Date { get; set; } = DateTime.Now;
 

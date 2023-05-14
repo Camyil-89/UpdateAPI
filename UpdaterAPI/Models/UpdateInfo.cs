@@ -13,19 +13,19 @@ namespace UpdaterAPI.Models
 		public List<LastVersionInfo> LastVersions { get; set; } = new List<LastVersionInfo>();
 		public List<VersionInfo> Versions { get; set; } = new List<VersionInfo>();
 
-		public void SetLastVersion(string version, TypeVersion type, DateTime date, string custom_type = null)
+		public void SetLastVersion(string version, TypeVersion type, TypeSystem system, DateTime date, string custom_type = null)
 		{
-			if (GetVersion(version, type, custom_type) == null)
+			if (GetVersion(version, type, system, custom_type) == null)
 				throw new Exception("Такой версии не существует!");
 
-			var last_version = LastVersions.FirstOrDefault((i) => i.Type == type);
+			var last_version = LastVersions.FirstOrDefault((i) => i.Type == type & i.TypeSystem == system);
 			if (last_version != null)
 			{
 				last_version.Version = version;
 				last_version.Date = date;
 				return;
 			}
-			LastVersions.Add(new LastVersionInfo() { Version = version, Date = date, Type = type, CustomType = custom_type });
+			LastVersions.Add(new LastVersionInfo() { Version = version, Date = date, Type = type, CustomType = custom_type, TypeSystem = system });
 		}
 		/// <summary>
 		/// Добавляет новую версию
@@ -33,7 +33,7 @@ namespace UpdaterAPI.Models
 		/// <param name="version"></param>
 		public void AddNewVersion(VersionInfo version)
 		{
-			if (GetVersion(version.Version, version.Type, version.CustomType) == null)
+			if (GetVersion(version.Version, version.Type, version.TypeSystem, version.CustomType) == null)
 				Versions.Add(version);
 			else
 				throw new Exception($"Такая версия уже существует! {version.Version} {version.Type} {version.CustomType}");
@@ -45,9 +45,9 @@ namespace UpdaterAPI.Models
 		/// <param name="type">Тип версии</param>
 		/// <param name="custom_type">Кастомный тип версии</param>
 		/// <returns></returns>
-		public VersionInfo GetVersion(string version, TypeVersion type, string custom_type = null)
+		public VersionInfo GetVersion(string version, TypeVersion type, TypeSystem system, string custom_type = null)
 		{
-			return Versions.FirstOrDefault((i) => i.Type == type && i.CustomType == custom_type && i.Version == version);
+			return Versions.FirstOrDefault((i) => i.Type == type && i.CustomType == custom_type && i.Version == version && i.TypeSystem == system);
 		}
 		/// <summary>
 		/// Получает информацию о последней версии
@@ -55,22 +55,22 @@ namespace UpdaterAPI.Models
 		/// <param name="type">Тип версии</param>
 		/// <param name="custom_type">Кастомный тип версии</param>
 		/// <returns></returns>
-		public LastVersionInfo GetLastVersion(TypeVersion type, string custom_type = null)
+		public LastVersionInfo GetLastVersion(TypeVersion type,TypeSystem system, string custom_type = null)
 		{
-			return LastVersions.FirstOrDefault((i) => i.Type == type && i.CustomType == custom_type);
+			return LastVersions.FirstOrDefault((i) => i.Type == type && i.CustomType == custom_type && i.TypeSystem == system);
 		}
-		public void DeleteLastVersionInfo(TypeVersion type, string custom_type = null)
+		public void DeleteLastVersionInfo(TypeVersion type, TypeSystem system, string custom_type = null)
 		{
-			LastVersions.Remove(GetLastVersion(type, custom_type));
+			LastVersions.Remove(GetLastVersion(type, system, custom_type));
 		}
 		public void DeleteVersionInfo(VersionInfo version)
 		{
-			var last_version = GetLastVersion(version.Type, version.CustomType);
+			var last_version = GetLastVersion(version.Type, version.TypeSystem, version.CustomType);
 			if (last_version.Version == version.Version)
 			{
 				LastVersions.Remove(last_version);
 			}
-			Versions.Remove(GetVersion(version.Version, version.Type, version.CustomType));
+			Versions.Remove(GetVersion(version.Version, version.Type, version.TypeSystem, version.CustomType));
 		}
 		public static UpdateInfo Create(string data)
 		{

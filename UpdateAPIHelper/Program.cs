@@ -36,7 +36,7 @@ namespace UpdateAPIHelper
 					downloader.SetUrlUpdateInfo("Camyil-89/UpdateAPI-Publish/main/UpdateInfo.xml");
 					downloader.SetUrlDowloadRoot("Camyil-89/UpdateAPI-Publish/main/versions");
 					var tmp_path = $"{Directory.GetCurrentDirectory()}\\update";
-					var last_version = downloader.GetLastVerison(UpdaterAPI.Models.TypeVersion.Release);
+					var last_version = downloader.GetLastVerison(UpdaterAPI.Models.TypeVersion.Release, UpdaterAPI.Models.TypeSystem.x64);
 
 					if (last_version.Version != Settings.Instance.Version && MessageBoxHelper.QuestionShow($"Доступна новая версия {last_version.Version}\nСкачать?") == MessageBoxResult.Yes)
 					{

@@ -93,6 +93,13 @@ namespace UpdateAPIHelper.ViewsModels
 		#endregion
 
 
+		#region TypeSystem: Description
+		/// <summary>Description</summary>
+		private TypeSystem _TypeSystemInfo = TypeSystem.x64;
+		/// <summary>Description</summary>
+		public TypeSystem TypeSystemInfo { get => _TypeSystemInfo; set => Set(ref _TypeSystemInfo, value); }
+		#endregion
+
 		#region VersionInfoType: Description
 		/// <summary>Description</summary>
 		private TypeVersion _VersionInfoType = TypeVersion.Release;
@@ -121,6 +128,13 @@ namespace UpdateAPIHelper.ViewsModels
 			get
 			{
 				return EnumHelper.GetAllValuesAndDescriptions<TypeVersion>();
+			}
+		}
+		public IEnumerable<KeyValuePair<string, string>> SystemTypes
+		{
+			get
+			{
+				return EnumHelper.GetAllValuesAndDescriptions<TypeSystem>();
 			}
 		}
 
@@ -313,6 +327,7 @@ namespace UpdateAPIHelper.ViewsModels
 		{
 			NewVersionInfo.Version = VersionInfoVersion;
 			NewVersionInfo.Type = VersionInfoType;
+			NewVersionInfo.TypeSystem = TypeSystemInfo;
 			NewVersionInfo.CustomType = VersionInfoCustomType;
 			NewVersionInfo.Date = VersionInfoDate;
 
@@ -385,7 +400,7 @@ namespace UpdateAPIHelper.ViewsModels
 		}
 		private void OnDeleteLastVersionInfoCommandExecuted(object e)
 		{
-			UpdateInfo.DeleteLastVersionInfo(VersionInfoType, VersionInfoCustomType);
+			UpdateInfo.DeleteLastVersionInfo(VersionInfoType, TypeSystemInfo, VersionInfoCustomType);
 			GenerateTree();
 		}
 		#endregion
@@ -411,7 +426,8 @@ namespace UpdateAPIHelper.ViewsModels
 		{
 			try
 			{
-				UpdateInfo.SetLastVersion(VersionInfoVersion, VersionInfoType, VersionInfoDate, VersionInfoCustomType);
+				Console.WriteLine(TypeSystemInfo);
+				UpdateInfo.SetLastVersion(VersionInfoVersion, VersionInfoType,TypeSystemInfo, VersionInfoDate, VersionInfoCustomType);
 				GenerateTree();
 			}
 			catch (Exception ex) { MessageBoxHelper.WarningShow(ex.Message); }
@@ -465,6 +481,7 @@ namespace UpdateAPIHelper.ViewsModels
 
 				version.Items.Add(new VersionItem() { Name = $"Дата: {i.Date}", Item = i, Type = TypeItem.VersionInfo });
 				version.Items.Add(new VersionItem() { Name = $"Тип: {i.Type}", Item = i, Type = TypeItem.VersionInfo });
+				version.Items.Add(new VersionItem() { Name = $"Тип: {i.TypeSystem}", Item = i, Type = TypeItem.VersionInfo });
 
 				var info = new VersionItem() { Name = $"Файлы", Item = i, Type = TypeItem.FileInfo };
 				foreach (var file in i.Files)
@@ -504,6 +521,7 @@ namespace UpdateAPIHelper.ViewsModels
 
 				version.Items.Add(new VersionItem() { Name = $"Дата: {i.Date}", Item = i, Type = TypeItem.LastVersionInfo });
 				version.Items.Add(new VersionItem() { Name = $"Тип: {i.Type}", Item = i, Type = TypeItem.LastVersionInfo });
+				version.Items.Add(new VersionItem() { Name = $"Тип системы: {i.TypeSystem}", Item = i, Type = TypeItem.LastVersionInfo });
 				if (string.IsNullOrEmpty(i.CustomType) == false)
 					version.Items.Add(new VersionItem() { Name = $"Кастомный тип: {i.CustomType}", Item = i, Type = TypeItem.LastVersionInfo });
 				info_last_version.Items.Add(version);

@@ -32,7 +32,6 @@ namespace UpdaterAPI.GitHub
 		private List<string> DowloadFiles = new List<string>();
 		private InfoDowload InfoDowload = new InfoDowload();
 		private bool AbortDowload = false;
-
 		/// <summary>
 		/// Если репозиторий приватный
 		/// </summary>
@@ -106,26 +105,24 @@ namespace UpdaterAPI.GitHub
 		/// <returns></returns>
 		public UpdateInfo GetUpdateInfo()
 		{
+			MemoryStream memoryStream = new MemoryStream(WebClient.DownloadData(UrlUpdateInfo));
 			try
 			{
-				using (var archive = new ZipArchive(new MemoryStream(WebClient.DownloadData(UrlUpdateInfo))))
+				using (var archive = new ZipArchive(memoryStream))
 				{
 					var file = archive.GetEntry($"{UrlUpdateInfo.Split('/').Last()}");
 					using (var stream = file.Open())
 					{
 						XmlSerializer xmls = new XmlSerializer(typeof(UpdateInfo));
-						var x = (UpdateInfo)xmls.Deserialize(stream);
-						return x;
+						return (UpdateInfo)xmls.Deserialize(stream);
 					}
 				}
 			}
 			catch { }
+			memoryStream.Position = 0;
 
-			using (MemoryStream sw = new MemoryStream(Encoding.UTF8.GetBytes(WebClient.DownloadString(UrlUpdateInfo))))
-			{
-				XmlSerializer xmls = new XmlSerializer(typeof(UpdateInfo));
-				return (UpdateInfo)xmls.Deserialize(sw);
-			}
+			XmlSerializer xml = new XmlSerializer(typeof(UpdateInfo));
+			return (UpdateInfo)xml.Deserialize(memoryStream);
 		}
 		/// <summary>
 		/// Получает информацию о последней версии выбранного типа
@@ -133,9 +130,9 @@ namespace UpdaterAPI.GitHub
 		/// <param name="type"></param>
 		/// <param name="custom_type"></param>
 		/// <returns></returns>
-		public LastVersionInfo GetLastVersionInfo(TypeVersion type, string custom_type = null)
+		public LastVersionInfo GetLastVersionInfo(TypeVersion type, TypeSystem system, string custom_type = null)
 		{
-			return GetUpdateInfo().GetLastVersion(type, custom_type);
+			return GetUpdateInfo().GetLastVersion(type, system, custom_type);
 		}
 		/// <summary>
 		/// Получает последнию версию программы выбранного типа
@@ -143,10 +140,10 @@ namespace UpdaterAPI.GitHub
 		/// <param name="type"></param>
 		/// <param name="custom_type"></param>
 		/// <returns></returns>
-		public VersionInfo GetLastVerison(TypeVersion type, string custom_type = null)
+		public VersionInfo GetLastVerison(TypeVersion type, TypeSystem system, string custom_type = null)
 		{
 			var info = GetUpdateInfo();
-			return info.GetVersion(info.GetLastVersion(type, custom_type).Version, type);
+			return info.GetVersion(info.GetLastVersion(type, system, custom_type).Version, type, system, custom_type);
 		}
 		/// <summary>
 		/// Скачивает файлы с гитхаба
@@ -214,10 +211,10 @@ namespace UpdaterAPI.GitHub
 		/// <param name="custon_type">Кастомный тип версии</param>
 		/// <returns></returns>
 		/// <exception cref="Exception"></exception>
-		public IEnumerable<InfoDowload> UpdateFiles(string version, TypeVersion type, string path_tmp_folder, string custon_type = null)
+		public IEnumerable<InfoDowload> UpdateFiles(string version, TypeVersion type, TypeSystem system, string path_tmp_folder, string custon_type = null)
 		{
 			var info = GetUpdateInfo();
-			foreach (var info_dowload in UpdateFiles(info.GetVersion(version, type, custon_type), path_tmp_folder))
+			foreach (var info_dowload in UpdateFiles(info.GetVersion(version, type, system, custon_type), path_tmp_folder))
 				yield return info_dowload;
 		}
 		/// <summary>
