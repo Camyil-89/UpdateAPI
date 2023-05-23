@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<UpdateInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<LastVersions>
+		<LastVersionInfo>
+			<Version>1.0</Version>
+			<Date>2023-04-17T00:14:42.7042848+03:00</Date>
+			<Type>Release</Type>
+		</LastVersionInfo>
+	</LastVersions>
+	<Versions>
+		<VersionInfo>
+			<Type>Release</Type>
+			<Version>1.0</Version>
+			<Date>2023-04-17T00:14:42.7068496+03:00</Date>
+			<Files>
+				<FileInfo>
+					<Path>\test.dll</Path>
+					<Url>Test.dll</Url>
+					<Hash>7f57177f04528512ebefd4da45011e67</Hash>
+				</FileInfo>
+				<FileInfo>
+					<Path>\Test.exe</Path>
+					<Url>Test.exe</Url>
+					<Hash>efe5efe521739d30b5c6c6462b1fb7c2</Hash>
+				</FileInfo>
+			</Files>
+		</VersionInfo>
+	</Versions>
+</UpdateInfo>
