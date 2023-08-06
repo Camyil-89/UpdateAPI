@@ -1,14 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net6.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Title>UpdaterAPIUI</Title>
+		<Version>1.1</Version>
+		<Authors>Camyil</Authors>
+		<Company>Camyil</Company>
+		<Product>Library for github</Product>
+		<Description>A library for quickly creating a file with application versions and updating it using GitHub.</Description>
+		<RepositoryUrl>https://github.com/Camyil-89/UpdateAPI</RepositoryUrl>
+		<Copyright>https://raw.githubusercontent.com/Camyil-89/UpdateAPI/dev/LICENSE</Copyright>
+		<PackageId>UpdaterAPIUI</PackageId>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\UpdaterAPI\UpdaterAPI.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\UpdaterAPI\UpdaterAPI.csproj" />
+	</ItemGroup>
 
 </Project>
