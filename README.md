@@ -1,5 +1,9 @@
 # UpdateAPI
 A library for quickly creating a file with application versions and updating it using GitHub.
+
+https://www.nuget.org/packages/UpdaterAPI/
+
+https://www.nuget.org/packages/UpdaterAPIUI/
 ## Example UI
 Use UpdateInfo from (https://github.com/Camyil-89/UpdateAPI-Publish).
 ```cs
