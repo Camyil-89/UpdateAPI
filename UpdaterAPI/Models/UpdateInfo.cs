@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Compression;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -71,6 +73,18 @@ namespace UpdaterAPI.Models
 				LastVersions.Remove(last_version);
 			}
 			Versions.Remove(GetVersion(version.Version, version.Type, version.TypeSystem, version.CustomType));
+		}
+		public static UpdateInfo Create(MemoryStream memoryStreamZip)
+		{
+			using (var archive = new ZipArchive(memoryStreamZip))
+			{
+				var file = archive.Entries.First();
+				using (var stream = file.Open())
+				{
+					XmlSerializer xmls = new XmlSerializer(typeof(UpdateInfo));
+					return (UpdateInfo)xmls.Deserialize(stream);
+				}
+			}
 		}
 		public static UpdateInfo Create(string data)
 		{

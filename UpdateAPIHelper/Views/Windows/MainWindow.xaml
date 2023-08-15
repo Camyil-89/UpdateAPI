@@ -31,12 +31,14 @@
 								<ColumnDefinition Width="75*"/>
 								<ColumnDefinition Width="10*"/>
 								<ColumnDefinition Width="10*"/>
+								<ColumnDefinition Width="10*"/>
 								<ColumnDefinition Width="15*"/>
 							</Grid.ColumnDefinitions>
 							<TextBox Grid.Column="0" FontSize="14" Height="25" Text="{Binding Settings.Parametrs.LastUrl}"/>
-							<Button Content="{Binding Source={x:Static lang:LangProvider.Language}, Path=[DowloadFromUrlBtn]}" FontSize="14" Grid.Column="1" Margin="2" Command="{Binding DowloadUpdateInfoFromUrlCommand}"/>
-							<Button Content="{Binding Source={x:Static lang:LangProvider.Language}, Path=[ResetBtn]}" FontSize="14" Grid.Column="2" Margin="2" Command="{Binding ResetUpdateInfoCommand}"/>
-							<Button Content="{Binding Source={x:Static lang:LangProvider.Language}, Path=[UseThisBtn]}" FontSize="14" Grid.Column="3" Margin="2" Command="{Binding UseTextUpdateInfoCommand}"/>
+							<Button Content="Выбрать" FontSize="14" Grid.Column="1" Margin="2" Command="{Binding OpenFileCommand}"/>
+							<Button Content="{Binding Source={x:Static lang:LangProvider.Language}, Path=[DowloadFromUrlBtn]}" FontSize="14" Grid.Column="2" Margin="2" Command="{Binding DowloadUpdateInfoFromUrlCommand}"/>
+							<Button Content="{Binding Source={x:Static lang:LangProvider.Language}, Path=[ResetBtn]}" FontSize="14" Grid.Column="3" Margin="2" Command="{Binding ResetUpdateInfoCommand}"/>
+							<Button Content="{Binding Source={x:Static lang:LangProvider.Language}, Path=[UseThisBtn]}" FontSize="14" Grid.Column="4" Margin="2" Command="{Binding UseTextUpdateInfoCommand}"/>
 						</Grid>
 					</Grid>
 					<TextBox Grid.Row="1" FontSize="14" AcceptsReturn="True" AcceptsTab="True" Text="{Binding TextUpdateInfo, UpdateSourceTrigger=PropertyChanged}"/>

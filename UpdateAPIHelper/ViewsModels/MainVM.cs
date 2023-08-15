@@ -427,7 +427,7 @@ namespace UpdateAPIHelper.ViewsModels
 			try
 			{
 				Console.WriteLine(TypeSystemInfo);
-				UpdateInfo.SetLastVersion(VersionInfoVersion, VersionInfoType,TypeSystemInfo, VersionInfoDate, VersionInfoCustomType);
+				UpdateInfo.SetLastVersion(VersionInfoVersion, VersionInfoType, TypeSystemInfo, VersionInfoDate, VersionInfoCustomType);
 				GenerateTree();
 			}
 			catch (Exception ex) { MessageBoxHelper.WarningShow(ex.Message); }
@@ -441,6 +441,33 @@ namespace UpdateAPIHelper.ViewsModels
 		{
 			UpdateInfo.DeleteVersionInfo((SelectedItem.Item as VersionInfo));
 			GenerateTree();
+		}
+		#endregion
+
+		#region OpenFileCommand: Description
+		private ICommand _OpenFileCommand;
+		public ICommand OpenFileCommand => _OpenFileCommand ??= new LambdaCommand(OnOpenFileCommandExecuted, CanOpenFileCommandExecute);
+		private bool CanOpenFileCommandExecute(object e) => true;
+		private void OnOpenFileCommandExecuted(object e)
+		{
+			CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+			dialog.IsFolderPicker = false;
+			dialog.Multiselect = false;
+			if (dialog.ShowDialog() == CommonFileDialogResult.Ok && File.Exists(dialog.FileName))
+			{
+				try
+				{
+					using (MemoryStream stream = new MemoryStream(File.ReadAllBytes(dialog.FileName)))
+					{
+						TextUpdateInfo = UpdaterAPI.Models.UpdateInfo.Create(stream).ToString();
+					}
+					return;
+				}
+				catch
+				{
+					TextUpdateInfo = File.ReadAllText(dialog.FileName);
+				}
+			}
 		}
 		#endregion
 		#endregion
